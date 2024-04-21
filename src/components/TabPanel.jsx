@@ -9,6 +9,7 @@ import { Typography } from '@mui/material';
 import MapIcon from '@mui/icons-material/Map';
 import AnalyticsIcon from '@mui/icons-material/Analytics';
 import InventoryIcon from '@mui/icons-material/Inventory';
+import ChatBubbleOutlineIcon from '@mui/icons-material/ChatBubbleOutline';
 import Dashboard from './Dashboard';
 import Products from './Products';
 
@@ -133,6 +134,7 @@ export default function VerticalTabs() {
         <Tab sx={{ fontWeight: 700, fontSize: 16, display: "flex", flexDirection: "row", gap: 1, justifyContent: 'flex-end' }} label={<><MapIcon /> Map</>}  {...a11yProps(0)} />
         <Tab sx={{  fontWeight: 700, fontSize: 16, display: "flex", flexDirection: "row", gap: 1, justifyContent: 'flex-end' }} label={<><AnalyticsIcon /> Panel</>} {...a11yProps(1)}/>
         <Tab onClick={handleGetProducts} sx={{  fontWeight: 700, fontSize: 16, display: "flex", flexDirection: "row", gap: 1, justifyContent: 'flex-end' }} label={<><InventoryIcon /> Products</>} {...a11yProps(2)} />
+        <Tab onClick={() => {window.location.href = "http://localhost:5174"}} sx={{  fontWeight: 700, fontSize: 16, display: "flex", flexDirection: "row", gap: 1, justifyContent: 'flex-end' }} label={<><ChatBubbleOutlineIcon /> Chat</>} {...a11yProps(2)} />
       </Tabs>
       </Box>
       <TabPanel value={value} index={0}>
