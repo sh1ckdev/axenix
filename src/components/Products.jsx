@@ -11,7 +11,7 @@ import {
     Box,
 } from '@mui/material';
 
-const Products = ({ products, onEdit, onDelete }) => {
+const Products = ({ products, inventories, onEdit, onDelete }) => {
     const [editProduct, setEditProduct] = useState(null);
 
     const handleEdit = (product) => {
@@ -31,36 +31,64 @@ const Products = ({ products, onEdit, onDelete }) => {
         setEditProduct(null);
     };
 
+    const combinedData = products.map(product => ({
+        ...product,
+        ...(inventories.find(inventory => inventory.product_id === product.id) || {})
+      }));
+      console.log(inventories)
+      console.log(combinedData)
     return (
         <>
-            <List sx={{ display: 'flex', gap: 5, flexDirection: 'column', maxWidth: '50%', m: 5 }}>
-                {products.map((product) => (
-                    <ListItem key={product.id} sx={{ backgroundColor: '#393939', }}>
-                        <ListItemText
-                            primary={product.name}
-                            secondary={
-                                <>
-                                    <Typography variant="body2" color='textPrimary' component="span">
-                                        Срок годности: {product.expiry_date}
-                                    </Typography>
-                                    <br />
-                                    <Typography variant="body2" color='textPrimary' component="span">
-                                        Объем: {product.volume}
-                                    </Typography>
-                                    <br />
-                                    <Typography variant="body2" color='textPrimary' component="span">
-                                        Вес: {product.weight}
-                                    </Typography>
-                                </>
-                            }
-                        />
-                        <Box sx={{ display: 'flex', gap: 2 }}>
-                            <Button onClick={() => handleEdit(product)} variant='contained'>Редактировать</Button>
-                            <Button onClick={() => handleDelete(product.id)} variant='contained' color='error'>Удалить</Button>
-                        </Box>
-                    </ListItem>
-                ))}
-            </List>
+        <List sx={{ display: 'flex', gap: 5, flexDirection: 'column', maxWidth: '50%', m: 5 }}>
+        {combinedData.map((product) => {
+    // Преобразуем JSON-объекты инвентаря в массив
+    const inventoriesArray = Array.isArray(inventories) ? inventories : [inventories];
+
+    // Найдем соответствующий инвентарь для текущего продукта
+    const inventory = inventoriesArray.find((inv) => inv.product_id === product.id);
+    console.log(inventory)
+
+    return (
+        <ListItem key={product.id} sx={{ backgroundColor: '#393939' }}>
+            <ListItemText
+                primary={product.name}
+                secondary={
+                    <>
+                        <Typography variant="body2" color="textPrimary" component="span">
+                            Срок годности: {product.expiry_date}
+                        </Typography>
+                        <br />
+                        <Typography variant="body2" color="textPrimary" component="span">
+                            Объем: {product.volume}
+                        </Typography>
+                        <br />
+                        <Typography variant="body2" color="textPrimary" component="span">
+                            Вес: {product.weight}
+                        </Typography>
+                        <br />
+                        <Typography variant="body2" color="textPrimary" component="span">
+                            Количество: {inventory ? inventory.quantity : 'N/A'}
+                        </Typography>
+                        <br />
+                        <Typography variant="body2" color="textPrimary" component="span">
+                            Условия: {inventory ? inventory.optimal_stock_levels : 'N/A'}
+                        </Typography>
+                    </>
+                }
+            />
+            <Box sx={{ display: 'flex', gap: 2 }}>
+                <Button onClick={() => handleEdit(product)} variant="contained">
+                    Редактировать
+                </Button>
+                <Button onClick={() => handleDelete(product.id)} variant="contained" color="error">
+                    Удалить
+                </Button>
+            </Box>
+        </ListItem>
+    );
+})}
+
+        </List>
 
             {/* Модальное окно для редактирования продукта */}
             <Modal open={Boolean(editProduct)} onClose={handleCloseEditModal}>
@@ -138,6 +166,7 @@ Products.propTypes = {
     products: PropTypes.array.isRequired,
     onEdit: PropTypes.func.isRequired,
     onDelete: PropTypes.func.isRequired,
+    inventories: PropTypes.array.isRequired,
 };
 
 export default Products;

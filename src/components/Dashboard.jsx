@@ -7,8 +7,13 @@ import { useEffect, useState } from 'react';
 const Dashboard = () => {
     // const theme = useTheme();
     const [salesData, setSalesData] = useState([]);
+    const [marketData, setMarketData] = useState([]);
     const chartSetting = {
-        yAxis: [{ label: 'Quantity Sold' }], 
+        yAxis: [{ label: 'Quantity Sold' }],
+        height: 300,
+    };
+    const chartSetting2 = {
+        yAxis: [{ label: 'Coefficient' }],
         height: 300,
     };
 
@@ -40,6 +45,37 @@ const Dashboard = () => {
         };
 
         handleGetRequest();
+    }, []);
+
+    useEffect(() => {
+        const handleGet = async () => {
+            try {
+                const response = await fetch('http://127.0.0.1:5000/markettrends');
+                const data2 = await response.json();
+
+                if (Array.isArray(data2)) {
+                    const formattedData2 = data2.map(trend => ({
+                        x: `${formatDate(new Date(trend.start_date))} - ${formatDate(new Date(trend.end_date))}`,
+                        y: trend.trend_coefficient
+                    }));
+
+                    setMarketData(formattedData2);
+                    console.log(formattedData2);
+                } else {
+                    console.error('Invalid data format: expected an array of objects');
+                }
+            } catch (error) {
+                console.error('Error fetching sales data:', error);
+            }
+        };
+
+        const formatDate = (date) => {
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            return `${day}.${month}`;
+        };
+
+        handleGet();
     }, []);
 
 
@@ -80,9 +116,9 @@ const Dashboard = () => {
                     <Box sx={{ display: 'flex', flexDirection: 'column', width: '45%', height: '350px', backgroundColor: "#393939", borderRadius: 5, boxShadow: `1px 3px 7px #555555` }}>
                         <Typography sx={{ pt: 3, pl: 3, fontSize: 20, fontWeight: 600 }}>График</Typography>
                         <BarChart
-                            dataset={salesData} 
-                            xAxis={[{ scaleType: 'band', dataKey: 'sale_date' }]} 
-                            series={[{ dataKey: 'quantity_sold', label: 'Quantity Sold' }]} 
+                            dataset={salesData}
+                            xAxis={[{ scaleType: 'band', dataKey: 'sale_date' }]}
+                            series={[{ dataKey: 'quantity_sold', label: 'Quantity Sold' }]}
                             grid={{ horizontal: true }}
                             sx={{
                                 [`& .${axisClasses.left} .${axisClasses.label}`]: {
@@ -135,7 +171,22 @@ const Dashboard = () => {
 
                     </Box>
                     <Box sx={{ display: 'flex', flexDirection: 'column', width: '45%', height: '350px', backgroundColor: "#393939", borderRadius: 5, boxShadow: `1px 3px 7px #555555` }}>
+                        <Typography sx={{ pt: 3, pl: 3, fontSize: 20, fontWeight: 600 }}>График</Typography>
 
+                        <BarChart
+                            dataset={marketData}
+                            xAxis={[{ scaleType: 'band', dataKey: 'x' }]}
+                            series={[{ dataKey: 'y', label: 'Trend Coefficient' }]}
+                            grid={{ horizontal: true }}
+                            sx={{
+                                [`& .${axisClasses.left} .${axisClasses.label}`]: {
+                                    transform: 'translateX(-10px)',
+                                },
+                                [`& .${chartsGridClasses.line}`]: { strokeDasharray: '5 3', strokeWidth: 2 },
+                            }}
+                            {...chartSetting2}
+                            colors={['#FF8354']}
+                        />
                     </Box>
                 </Box>
             </Box>

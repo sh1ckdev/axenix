@@ -18,6 +18,7 @@ const MapComponent = () => {
         const response = await fetch('http://127.0.0.1:5000/salespoints');
         const data = await response.json();
         setStores(data);
+        console.log(data)
       } catch (error) {
         console.error('Error fetching sales points:', error);
       }
@@ -193,7 +194,9 @@ const MapComponent = () => {
             boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)',
             zIndex: 1000
           }}>          <h2>{selectedStore.name}</h2>
-            <p>{selectedStore.coordinates}</p></div>
+            <p>{selectedStore.coordinates}</p>
+            <p>{selectedStore.volume}</p>
+            </div>
           <Box sx={{ display: 'flex', flexDirection: 'column', width: "30%", gap: 2, m: 2 }}>
             <TextField
               InputProps={{

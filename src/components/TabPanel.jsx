@@ -8,6 +8,7 @@ import Logo from '../assets/logo.svg'
 import { Typography } from '@mui/material';
 import MapIcon from '@mui/icons-material/Map';
 import AnalyticsIcon from '@mui/icons-material/Analytics';
+import InventoryIcon from '@mui/icons-material/Inventory';
 import Dashboard from './Dashboard';
 import Products from './Products';
 
@@ -50,24 +51,28 @@ export default function VerticalTabs() {
   const [products, setProducts] = React.useState([]);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState(null);
+  const [inventories, setInventories] = React.useState([]);
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
   };
 
-  const handleGetRequest = async () => {
+  const handleGetProducts = async () => {
     setLoading(true);
     try {
       const response = await fetch('http://127.0.0.1:5000/products');
       const data = await response.json();
+      const responseInvent = await fetch('http://127.0.0.1:5000/inventories');
+      const dataInvent = await responseInvent.json();
       setProducts(data);
+      setInventories(dataInvent);
+      console.log(dataInvent)
     } catch (error) {
       setError(error);
     } finally {
       setLoading(false);
     }
   };
-
   const handleEditProduct = async (editedProduct) => {
     try {
       const response = await fetch(`http://127.0.0.1:5000/product/edit/${editedProduct.id}`, {
@@ -78,7 +83,7 @@ export default function VerticalTabs() {
         body: JSON.stringify(editedProduct),
       });
       if (response.ok) {
-        handleGetRequest();
+        handleGetProducts();
       } else {
         throw new Error('Failed to edit product');
       }
@@ -94,7 +99,7 @@ export default function VerticalTabs() {
       });
       if (response.ok) {
         // Обновление списка продуктов после успешного удаления
-        handleGetRequest();
+        handleGetProducts();
       } else {
         throw new Error('Failed to delete product');
       }
@@ -127,7 +132,7 @@ export default function VerticalTabs() {
       >
         <Tab sx={{ fontWeight: 700, fontSize: 16, display: "flex", flexDirection: "row", gap: 1, justifyContent: 'flex-end' }} label={<><MapIcon /> Map</>}  {...a11yProps(0)} />
         <Tab sx={{  fontWeight: 700, fontSize: 16, display: "flex", flexDirection: "row", gap: 1, justifyContent: 'flex-end' }} label={<><AnalyticsIcon /> Panel</>} {...a11yProps(1)}/>
-        <Tab onClick={handleGetRequest} sx={{  fontWeight: 700, fontSize: 16, display: "flex", flexDirection: "row", gap: 1, justifyContent: 'flex-end' }} label={<><AnalyticsIcon /> Products</>} {...a11yProps(2)} />
+        <Tab onClick={handleGetProducts} sx={{  fontWeight: 700, fontSize: 16, display: "flex", flexDirection: "row", gap: 1, justifyContent: 'flex-end' }} label={<><InventoryIcon /> Products</>} {...a11yProps(2)} />
       </Tabs>
       </Box>
       <TabPanel value={value} index={0}>
@@ -142,7 +147,7 @@ export default function VerticalTabs() {
         ) : error ? (
           <Typography>Error: {error.message}</Typography>
         ) : (
-          <Products products={products} onEdit={handleEditProduct} onDelete={handleDeleteProduct} />
+          <Products products={products} inventories={inventories} onEdit={handleEditProduct} onDelete={handleDeleteProduct} />
         )}
       </TabPanel>
 
